@@ -1,0 +1,66 @@
+see here in User Service find that controller which is internally
+communicating with Rating Service and Hotel Service and apply Circuit Breaker pattern on that method.
+to apply Circuit Breaker pattern in Spring Boot, you can use the Resilience4j library, which provides easy-to-use annotations for implementing circuit breakers. Below is an example of how to apply the Circuit Breaker pattern in a controller method that communicates with the Rating Service and Hotel Service.
+
+lets say getUserById this controller method is communicating with Rating Service and Hotel Service.
+so we will apply Circuit Breaker pattern on this method.
+
+by Annotations  @CircuitBreaker provided by Resilience4j.
+also we can mention fallback method to be called when the circuit is open or an error occurs.
+
+    @CircuitBreaker(name="ratingHotelBreaker",fallbackMethod = "ratingHotelFallback") this is the annotation to apply Circuit Breaker pattern.
+
+    while implementing this you can take help of https://resilience4j.readme.io/docs/getting-started
+
+  # 1. Management/Actuator Settings: Used to monitor the "Health" of your Circuit Breakers
+  management:
+    health:
+      circuitbreakers:
+        enabled: true # Allows Actuator to see the status of Resilience4j
+    endpoints:
+      web:
+        exposure:
+          include: health # Exposes the /actuator/health endpoint
+    endpoint:
+      health:
+        show-details: always # Shows exactly which circuit is OPEN or CLOSED when you hit the health URL
+
+  # 2. Resilience4j Settings: The "Rules" for your Circuit Breaker
+  resilience4j:
+    circuitbreaker:
+      instances:
+        ratingHotelBreaker: # This name MUST match the one in your @CircuitBreaker(name="...")
+          registerHealthIndicator: true # Connects this specific breaker to the Actuator health check
+          eventConsumerBufferSize: 10 # Keeps the last 10 events in memory for debugging
+          failureRateThreshold: 50 # If 50% of requests fail, the circuit TRIPs (opens)
+          minimumNumberOfCalls: 5 # Don't calculate failure rate until at least 5 calls are made
+          automaticTransitionFromOpenToHalfOpenEnabled: true # Automatically tries to recover after the wait time
+          waitDurationInOpenState: 6s # How long to stay in "OPEN" (broken) state before trying again
+          permittedNumberOfCallsInHalfOpenState: 3 # How many "test" calls to allow in Half-Open state
+          slidingWindowSize: 10 # Look at the last 10 calls to decide if the circuit should trip
+          slidingWindowType: COUNT_BASED # Bases the decision on number of calls (not time/seconds)
+
+  These configurations are the "fine-tuning" parameters for your microservice's safety system. Here is a brief, high-level breakdown of what each section and property is actually doing for your project.
+  ________________________________________
+  1. Actuator & Health Monitoring (management)
+  This section connects your code's internal health to an external URL so you can see if your "fuses" are working.
+  •	health.circuitbreakers.enabled: true: This turns on the monitoring for Resilience4j inside Spring Boot.
+  •	endpoints.web.exposure.include: health: This tells Spring Boot to make the /actuator/health URL public so you can hit it from your browser.
+  •	health.show-details: always: This is the most important part for you. Without this, the URL just says "UP." With it, it shows the exact state (CLOSED, OPEN, HALF-OPEN) and the failure percentage of your ratingHotelBreaker.
+  ________________________________________
+  2. Resilience4j Core Settings (resilience4j)
+  This section defines the "intelligence" of your Circuit Breaker named ratingHotelBreaker.
+  •	registerHealthIndicator: true: This registers this specific breaker instance into the health endpoint we enabled above.
+  •	failureRateThreshold: 50: The trigger point. If 50% of the requests in your "window" fail, the circuit trips (opens).
+  •	minimumNumberOfCalls: 5: The "grace period." The breaker won't even start calculating the 50% threshold until it has at least 5 calls to look at. This prevents the circuit from opening after just one random glitch.
+  •	slidingWindowSize: 10: The memory. The breaker only remembers the last 10 calls. This ensures that if a service was bad 10 minutes ago but is fine now, it won't stay blocked by old failures.
+  •	slidingWindowType: COUNT_BASED: This tells the breaker to measure by the number of calls (10 calls) rather than a time window (like 10 seconds).
+  •	waitDurationInOpenState: 6s: The "cooling off" period. When the circuit is OPEN (broken), it will stay that way for 6 seconds, giving the HOTEL-SERVICE time to recover before the User Service even tries to call it again.
+  •	automaticTransitionFromOpenToHalfOpenEnabled: true: Once those 6 seconds are up, the breaker will automatically switch to HALF-OPEN on its own, without waiting for a new user request to trigger it.
+  •	permittedNumberOfCallsInHalfOpenState: 3: The "test phase." When in HALF-OPEN, it allows exactly 3 calls to go through.
+  o	If they succeed, the circuit CLOSES (Back to normal).
+  o	If they fail, the circuit goes back to OPEN (Broken) for another 6 seconds.
+  ________________________________________
+  💡 Why this is a "Senior" move for your notes:
+  By using these settings, you are preventing Cascading Failures.
+  If your HOTEL-SERVICE goes down, these settings ensure your USER-SERVICE doesn't sit there hanging and wasting threads. It "fails fast," protects itself, and gives the broken service a quiet 6 seconds to restart.

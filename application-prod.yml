@@ -1,0 +1,23 @@
+
+
+# this is config server application-prod.yml file
+# FILE: application-prod.yml (In GitHub)
+
+spring:
+  application:
+    name: PRODPROFILE
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, gateway

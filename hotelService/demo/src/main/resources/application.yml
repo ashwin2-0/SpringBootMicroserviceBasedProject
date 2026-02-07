@@ -1,0 +1,8 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: HOTEL-SERVICE
+  config:
+    import: "optional:configserver:http://localhost:8085/"

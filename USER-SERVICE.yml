@@ -1,0 +1,61 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/microservices?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password: "Pass@1234"
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+# --- MONITORING (ACTUATOR) ---
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health, info, env
+  endpoint:
+    health:
+      show-details: always
+
+# --- FAULT TOLERANCE (RESILIENCE4J) ---
+resilience4j:
+  # 1. CIRCUIT BREAKER (Order 1: Runs First)
+  circuitbreaker:
+    circuit-breaker-aspect-order: 1 
+    instances:
+      ratingHotelBreaker:
+        registerHealthIndicator: true
+        eventConsumerBufferSize: 10
+        failureRateThreshold: 50
+        minimumNumberOfCalls: 5
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 6s
+        permittedNumberOfCallsInHalfOpenState: 3
+        slidingWindowSize: 10
+        slidingWindowType: COUNT_BASED
+
+  # 2. RETRY (Order 2: Runs Second)
+  retry:
+    retry-aspect-order: 2      
+    instances:
+      retryRatingHotel:
+        maxAttempts: 3
+        waitDuration: 2s
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2
+        retryExceptions:
+          - java.lang.Throwable 
+
+  # 3. RATE LIMITER (Order 3: Runs Third)
+  ratelimiter:
+    rate-limiter-aspect-order: 3
+    instances:
+      userRateLimiter:
+        limitForPeriod: 2       # 2 requests allowed per cycle
+        limitRefreshPeriod: 10s # Reset every 10 seconds
+        timeoutDuration: 0s     # Fail immediately if no tokens available

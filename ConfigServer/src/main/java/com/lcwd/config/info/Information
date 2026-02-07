@@ -1,0 +1,31 @@
+ this  file is created for giving information about this config server project
+
+ when when you configure the application.yml file in any microservice
+ then that microservice will come to this config server and get all the information
+ about the configuration from this config server
+
+ in short ye config server git hub se configuration le k aayega microservice ko dega bassss
+  aur kisi bhi service  ko aise git hub se information lene ke liye usko config client banana padega jaise ki humne abhi tak kiya hai
+    by default config server will look for "default" profile
+   to enable this application as config server we have used
+    @EnableConfigServer
+    in the main class of this project
+    and add below dependency in pom.xml file
+       <dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-starter-config</artifactId>
+    </dependency>
+
+
+ here as there no profile is given to select hence by default in log it will show as "default" profile is being used
+
+
+ No active profile set, falling back to 1 default profile: "default"
+ When u will hit http://visionforgex:8085/application/default
+    then you will get all the configuration present in this config server in application.yml file
+    there you can configure spring:  application:  name: defaultconfig to test this.yml file
+
+    in the same way if you hit http://visionforgex:8085/application/dev
+    then in that case it will look for application-dev.yml file in this config server
+    and give all the configuration present in that file to the microservice which is requesting
+    for checking you can again give spring:  application:  name: DEV PROFILE SERVICE to test this.yml file

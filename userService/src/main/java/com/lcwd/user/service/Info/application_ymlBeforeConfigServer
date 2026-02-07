@@ -1,0 +1,33 @@
+server:
+    port: 8081
+
+spring:
+    application:
+        name: USER-SERVICE
+    # profiles:
+    # active: prod
+    # MOVE THIS OUT of 'application'
+    config:
+        import: "optional:configserver:http://localhost:8085/" # Trailing slash is best practice
+
+
+    # NOTE: Once your Config Server is working, you will DELETE these lines
+    # and move them to GitHub. Keeping them here now is okay for testing.
+    datasource:
+        url: jdbc:mysql://localhost:3306/microservices?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+        username: root
+        password: "Pass@1234"
+        driver-class-name: com.mysql.cj.jdbc.Driver
+    jpa:
+        hibernate:
+            ddl-auto: update
+        show-sql: true
+
+eureka:
+    instance:
+        prefer-ip-address: true
+    client:
+        fetch-registry: true
+        register-with-eureka: true
+        service-url:
+            defaultZone: http://localhost:8761/eureka/

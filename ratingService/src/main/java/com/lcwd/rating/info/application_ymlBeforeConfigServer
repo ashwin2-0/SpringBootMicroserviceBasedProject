@@ -1,0 +1,18 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: RATING-SERVICE         # Name that will show up in Eureka
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/microservices
+
+eureka:
+  instance:
+    prefer-ip-address: true      # Helps services find each other via IP
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/

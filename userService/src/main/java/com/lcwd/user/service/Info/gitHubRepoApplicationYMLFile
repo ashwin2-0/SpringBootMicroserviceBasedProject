@@ -1,0 +1,72 @@
+spring:
+  datasource:
+    # JDBC URL to connect to MySQL database
+    # localhost → DB is running on same machine
+    # 3306 → default MySQL port
+    # microservices → database name
+    # useSSL=false → disables SSL (common in local/dev)
+    # serverTimezone=UTC → avoids timezone mismatch issues
+    # allowPublicKeyRetrieval=true → required for newer MySQL versions
+    url: jdbc:mysql://localhost:3306/microservices?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+
+    # Database username
+    username: root
+
+    # Database password
+    # Quoted because special character '@' is used
+    password: "Pass@1234"
+
+    # MySQL JDBC driver class
+    # Required for Spring to know which DB driver to use
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      # Controls how Hibernate handles DB schema
+      # update → creates tables if not present, updates columns if changed
+      ddl-auto: update
+
+    # Prints SQL queries in console/logs
+    # Useful for debugging and learning
+    show-sql: true
+
+# --- FAULT TOLERANCE & MONITORING CONFIGURATION ---
+
+# 1. Management/Actuator Settings: Used to monitor the "Health" of your Circuit Breakers
+management:
+  health:
+    circuitbreakers:
+      enabled: true # Allows Actuator to see the status of Resilience4j
+  endpoints:
+    web:
+      exposure:
+        include: health # Exposes the /actuator/health endpoint
+  endpoint:
+    health:
+      show-details: always # Shows exactly which circuit is OPEN or CLOSED when you hit the health URL
+
+# 2. Resilience4j Settings: The "Rules" for your Circuit Breaker
+resilience4j:
+  circuitbreaker:
+    instances:
+      ratingHotelBreaker: # This name MUST match the one in your @CircuitBreaker(name="...")
+        registerHealthIndicator: true # Connects this specific breaker to the Actuator health check
+        eventConsumerBufferSize: 10 # Keeps the last 10 events in memory for debugging
+        failureRateThreshold: 50 # If 50% of requests fail, the circuit TRIPs (opens)
+        minimumNumberOfCalls: 5 # Don't calculate failure rate until at least 5 calls are made
+        automaticTransitionFromOpenToHalfOpenEnabled: true # Automatically tries to recover after the wait time
+        waitDurationInOpenState: 6s # How long to stay in "OPEN" (broken) state before trying again
+        permittedNumberOfCallsInHalfOpenState: 3 # How many "test" calls to allow in Half-Open state
+        slidingWindowSize: 10 # Look at the last 10 calls to decide if the circuit should trip
+        slidingWindowType: COUNT_BASED # Bases the decision on number of calls (not time/seconds)
+   retry:
+      instances:
+        hotelRetry:
+          maxAttempts: 3 # Total tries (1 initial + 2 retries)
+          waitDuration: 2s # Wait 2 seconds before the first retry
+          enableExponentialBackoff: true
+          exponentialBackoffMultiplier: 2 # Double the wait time each try (2s, then 4s)
+          retryExceptions:
+            - org.springframework.web.client.HttpServerErrorException
+            - java.io.IOException
+            - java.util.concurrent.TimeoutException

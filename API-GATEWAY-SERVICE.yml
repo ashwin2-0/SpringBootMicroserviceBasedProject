@@ -1,0 +1,45 @@
+spring:
+  cloud:
+    gateway:
+      routes:                     # Defines the list of routing rules (each route tells Gateway where to send incoming requests)
+      
+      - id: user-service          # Unique identifier/name for this route (used in logs, actuator, debugging)
+        uri: lb://USER-SERVICE    # Destination – lb:// means "load-balanced" → uses Spring Cloud LoadBalancer to pick instance from Eureka/Consul/etc.
+                                  # USER-SERVICE is the service name registered in service discovery
+        predicates:               # Conditions — request must match ALL predicates to use this route
+        - Path=/users/**          # Matches any request that starts with /users/ (e.g. /users, /users/123, /users/profile/photo etc.)
+
+      - id: hotel-service
+        uri: lb://HOTEL-SERVICE
+        predicates:
+        - Path=/hotels/**,/hotelStaff/**
+                                  # Matches requests starting with /hotels/ OR /hotelStaff/
+                                  # (comma means OR between patterns in the same Path predicate)
+
+      - id: rating-service
+        uri: lb://RATING-SERVICE
+        predicates:
+        - Path=/ratings/**        # Matches any request starting with /ratings/
+
+      # ──────────────────────────────────────────────
+      # The parts below are NOT routes — they are Gateway's own settings
+
+management:
+  endpoint:
+    gateway: 
+      enabled: true             # Activates /actuator/gateway endpoint (very useful!)
+                                # Lets you see all routes, refresh routes, see predicates/filters etc.
+                                # Main URLs:
+                                #   GET  /actuator/gateway/routes
+                                #   GET  /actuator/gateway/routes/{id}
+                                #   POST /actuator/gateway/refresh
+
+logging:
+  level:
+    org.springframework.cloud.gateway: TRACE
+                                  # Most detailed logging level for Gateway itself
+                                  # Shows route matching decisions, filter execution, request/response details
+                                  
+    org.springframework.http.server.reactive: DEBUG
+                                  # Logs HTTP request/response headers, status, body metadata (reactive server level)
+                                  # Very helpful when debugging why a request is not routed or gets 404/502

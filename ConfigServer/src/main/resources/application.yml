@@ -1,0 +1,18 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: CONFIG-SERVER-SERVICE
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/ashwin2-0/WorkSpaceZoneForAspirant.git  # the purpose of this url is to point to the github repo where all the microservice yml files are stored
+          # Use your GitHub username
+          username: ashwin2-0
+          # Use the Personal Access Token here, NOT your GitHub password
+          password: ${GITHUB_TOKEN}   # this is not password this is token generated from github for security reasons because github no longer allows password authentication for git operations and another reason thar repository is private if it was public no need of username and password
+          search-paths: 'LCWD/Microservices Based Project'
+          default-label: main
+          clone-on-start: true

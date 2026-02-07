@@ -1,0 +1,29 @@
+Purpose of adding
+
+    config:
+        import: "optional:configserver:http://localhost:8085/"
+
+        this in application.yml file of any microservice
+        will make that microservice a config client
+        and that microservice will come to this config server to get all the configuration information
+        from this config server
+        here as our config server which is central breain whic connected to the Git     hub repo
+        is running on localhost:8085
+        so we have given the url of config server in the import statement
+        and we have made it optional so that if config server is down
+        then also our microservice will run with the default configuration present in its own application.yml file
+//
+//  similarly you can give the url of config server present on any other system also
+//    like http://visionforgex:8085/
+//
+//  after adding this import statement in the application.yml file of any microservice
+//   you need to restart that microservice to get the configuration from config server
+//
+//  Note:  after adding this import statement in the application.yml file of any microservice
+//   you need to restart that microservice to get the configuration from config server
+//
+package com.lcwd.user.service.Info;
+
+if u write     profiles:
+                   active: prod then it will look for application-prod.yml file in this config server
+                   and give all the configuration present in that file to the microservice which is requesting
