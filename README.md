@@ -6,7 +6,7 @@
 Overview: A distributed microservices architecture designed to manage user profiles, ratings, and hotel information.
 The system is built with a centralized configuration, service discovery, and advanced resilience patterns.
 
-1. System Architecture
+**1. System Architecture**
 
 The project follows a decentralized microservices pattern where each service owns its data and communicates via REST using Feign Clients.
 
@@ -18,13 +18,16 @@ The project follows a decentralized microservices pattern where each service own
 
 2. **Service Catalog**
    
-Service Name	Port	Primary Responsibility
-SERVICE-REGISTRY	**8761**	Netflix Eureka Server; allows services to find each other by name.
-CONFIG-SERVER	**8888**	Pulls and serves .yml files from GitHub to all services.
-USER-SERVICE	**8081**	Core service for User management; aggregates Ratings and Hotel data.
-RATING-SERVICE	**8083**	Manages user reviews and scores for various hotels.
-HOTEL-SERVICE	**8082**	Manages hotel details (name, location, about).
-4. Data Models & Entities
+| Service Name         | Port | Primary Responsibility                                                                                |
+| -------------------- | ---- | ----------------------------------------------------------------------------------------------------- |
+| **SERVICE-REGISTRY** | 8761 | Netflix Eureka Server; enables service registration and discovery using service names.                |
+| **CONFIG-SERVER**    | 8888 | Centralized configuration server that pulls and serves `.yml` files from GitHub to all microservices. |
+| **USER-SERVICE**     | 8081 | Core service for user management; aggregates Rating and Hotel data from other services.               |
+| **HOTEL-SERVICE**    | 8082 | Manages hotel details such as name, location, and description.                                        |
+| **RATING-SERVICE**   | 8083 | Manages user ratings and reviews for different hotels.                                                |
+
+
+**3. Data Models & Entities**
 Each service uses its own database (Database-per-Service) to ensure loose coupling.
 
 👤 **User Service**
@@ -34,16 +37,16 @@ Transient Field: List<Rating> ratings (Populated at runtime by calling Rating-Se
 🏨 **Hotel Service**
 Entity: Hotel
 Fields: id (String), name (String), location (String), about (String).
-⭐ R**ating Service**
+⭐ **Rating Service**
 Entity: Rating
 Fields: ratingId (String), userId (String), hotelId (String), rating (int), feedback (String).
 
-4. Key Dependencies & "The Why"
+**4. Key Dependencies & "The Why"**
 These are the most important libraries in your pom.xml:
 
 Dependency	Purpose	Why we added it
 
-## 4. Key Dependencies & "The Why"
+**Key Dependencies & "The Why"**
 
 Below are the most important libraries included in the `pom.xml` and the reasoning behind their inclusion:
 
@@ -56,7 +59,7 @@ Below are the most important libraries included in the `pom.xml` and the reasoni
 | **Okta Starter** | Security | Handles login and JWT validation automatically so we don't store passwords. |
 | **Lombok** | Boilerplate | Removes the need for manual Getters, Setters, and Builders. |
 
-5. Resilience Implementation (The "Onion" Layers)
+**5. Resilience Implementation (The "Onion" Layers)**
    
 We implemented a triple-layer defense on the getUserById endpoint in the User-Service:
 
@@ -65,11 +68,34 @@ Retry: If a call fails due to a network glitch, it re-attempts the call 3 times 
 Rate Limiter: Limits users to 2 requests every 10 seconds to prevent server overload.
 
 
-6. How to Run the Project
-To start the system, run the services in this exact order:
+## ▶️ How to Run the Project
 
-Eureka Server (Wait for Dashboard at :8761).
-Config Server (Ensure it connects to GitHub).
-Hotel & Rating Services.
-User Service.
+To start the application successfully, please run the services in the following order:
 
+1. **Service Registry (Eureka Server)**
+   - Start the Eureka Server first.
+   - Wait until the Eureka dashboard is available at:
+     - http://localhost:8761
+
+2. **Config Server**
+   - Start the Config Server after Eureka.
+   - Ensure it successfully:
+     - Connects to the GitHub repository
+     - Loads all configuration (`.yml`) files
+
+3. **Hotel Service & Rating Service**
+   - Start the Hotel Service and Rating Service once the Config Server is up.
+   - Verify that both services are registered in the Eureka dashboard.
+
+4. **User Service**
+   - Start the User Service last.
+   - This service depends on Hotel and Rating services for data aggregation.
+
+✅ Once all services are running and visible in the Eureka dashboard, the system i
+
+
+Start the User Service last.
+
+This service depends on Hotel and Rating services for data aggregation.
+
+✅ Once all services are running and registered with Eureka, the system will be fully operational.
