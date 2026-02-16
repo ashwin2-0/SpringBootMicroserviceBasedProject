@@ -1,0 +1,28 @@
+see thats how we can generate the keystore file using the keytool command in the terminal. The command you provided generates a key pair and a self-signed certificate with the specified details.
+
+
+D:\VisionForgeX\WorkSpaceZone\LCWD\Microservices Based Project\userService\src\main\resources>keytool -genkeypair -alias micro-service -keyalg RSA -keysize 2048 -storetype PKCS12 -keystore microservices.p12 -validity 365
+Enter keystore password:
+
+Re-enter new password:
+
+Enter the distinguished name. Provide a single dot (.) to leave a sub-component empty or press ENTER to use the default value in braces.
+What is your first and last name?
+  [Unknown]:  ashwin ingle
+What is the name of your organizational unit?
+  [Unknown]:  visionForgeX
+What is the name of your organization?
+  [Unknown]:  aspirant
+What is the name of your City or Locality?
+  [Unknown]:  Bengaluru
+What is the name of your State or Province?
+  [Unknown]:  Maharashtra
+What is the two-letter country code for this unit?
+  [Unknown]:  IN
+Is CN=ashwin ingle, OU=visionForgeX, O=aspirant, L=Bengaluru, ST=Maharashtra, C=IN correct?
+  [no]:  yes
+
+Generating 2,048 bit RSA key pair and self-signed certificate (SHA384withRSA) with a validity of 365 days
+        for: CN=ashwin ingle, OU=visionForgeX, O=aspirant, L=Bengaluru, ST=Maharashtra, C=IN
+
+D:\VisionForgeX\WorkSpaceZone\LCWD\Microservices Based Project\userService\src\main\resources>

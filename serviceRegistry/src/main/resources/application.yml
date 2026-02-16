@@ -1,5 +1,11 @@
 server:
   port: 8761
+  ssl:
+    enabled: true
+    key-store: classpath:microservices.p12 # Make sure this file is in serviceRegistry/src/main/resources
+    key-store-password: Pass@1234 # The password you set when creating the keystore
+    key-store-type: PKCS12  # this is the type of keystore we created
+    key-alias: micro-service  # this is the alias we set when creating the keystore used when we created the keystore
 
 eureka:
   instance:
@@ -8,4 +14,5 @@ eureka:
     register-with-eureka: false
     fetch-registry: false
     service-url:
-      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+      # CHANGE THIS TO HTTPS becaues we enabled SSL for the Eureka server. Also, make sure to use the correct port (8761) and hostname (localhost).
+      defaultZone: https://${eureka.instance.hostname}:${server.port}/eureka/
