@@ -56,6 +56,6 @@ resilience4j:
     rate-limiter-aspect-order: 3
     instances:
       userRateLimiter:
-        limitForPeriod: 2       # 2 requests allowed per cycle
-        limitRefreshPeriod: 10s # Reset every 10 seconds
-        timeoutDuration: 0s     # Fail immediately if no tokens available
+        limitForPeriod: 10       # 2 requests allowed per cycle
+        limitRefreshPeriod: 1s # Reset every 10 seconds
+        timeoutDuration: 500ms     # Fail immediately if no tokens available
