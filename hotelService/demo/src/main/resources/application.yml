@@ -1,11 +1,5 @@
 server:
   port: 8082
-  ssl:
-    enabled: true
-    key-store: classpath:microservices.p12 # Look for the file we just created
-    key-store-password: Pass@1234 # The password you set in Step 1
-    key-store-type: PKCS12 # this is the type of keystore we created
-    key-alias: micro-service
 
 spring:
   application:

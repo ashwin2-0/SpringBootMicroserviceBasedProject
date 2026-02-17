@@ -1,11 +1,5 @@
 server:
   port: 8085
-  ssl:
-    enabled: true
-    key-store: classpath:microservices.p12 # Look for the file we just created
-    key-store-password: Pass@1234 # The password you set in Step 1
-    key-store-type: PKCS12 # this is the type of keystore we created
-    key-alias: micro-service
 
 spring:
   application:
@@ -22,3 +16,11 @@ spring:
           search-paths: 'LCWD/Microservices Based Project'
           default-label: main
           clone-on-start: true
+# Local application.yml in your Config Server project
+eureka:
+  instance:
+    hostname: localhost
+
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
