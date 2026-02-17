@@ -49,9 +49,9 @@ public class UserServiceImpl implements IUserService {
             // API Call to HOTEL-SERVICE: http://HOTEL-SERVICE/hotels/{hotelId}
             // now lsiten carefully here we are calling hotel service to get hotel info for each rating by using rest template
             // Spring will now correctly resolve "HOTEL-SERVICE" thanks to @LoadBalanced
-           // Hotel hotel = restTemplate.getForObject("http://HOTEL-SERVICEE/hotels/" + rating.getHotelId(), Hotel.class);
+            // Hotel hotel = restTemplate.getForObject("http://HOTEL-SERVICEE/hotels/" + rating.getHotelId(), Hotel.class);
             // but now instead of rest template we will use feign client to call hotel service
-             Hotel hotel = hotelService.getHotel(rating.getHotelId());
+            Hotel hotel = hotelService.getHotel(rating.getHotelId());
 
             // Set the fetched hotel into the current rating
             rating.setHotel(hotel);
