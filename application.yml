@@ -4,7 +4,7 @@ eureka:
   instance:
     prefer-ip-address: true
     non-secure-port-enabled: true
-    secure-port-enabled: true
+    secure-port-enabled: false
   client:
     fetch-registry: true
     register-with-eureka: true
