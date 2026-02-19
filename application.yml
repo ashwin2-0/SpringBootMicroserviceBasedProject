@@ -3,18 +3,27 @@
 eureka:
   instance:
     prefer-ip-address: true
-    # ADD THESE TWO LINES
     non-secure-port-enabled: false
     secure-port-enabled: true
   client:
     fetch-registry: true
     register-with-eureka: true
     service-url:
-      # CHANGE http TO https
       defaultZone: https://localhost:8761/eureka/
 
 management:
+  tracing:
+    sampling:
+      probability: 1.0   # Captures 100% of requests (perfect for dev)
+  zipkin:
+    tracing:
+      endpoint: "http://localhost:9411/api/v2/spans"   # Zipkin server address
   endpoints:
     web:
       exposure:
         include: env, health, info, gateway
+
+# This pattern adds [ServiceName, TraceId, SpanId] to your IntelliJ logs!
+logging:
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
