@@ -15,6 +15,8 @@ management:
   tracing:
     sampling:
       probability: 1.0   # Captures 100% of requests (perfect for dev)
+    propagation:
+      type: B3    # <--- THIS IS THE MAGIC LINE
   zipkin:
     tracing:
       endpoint: "http://localhost:9411/api/v2/spans"   # Zipkin server address
